@@ -1,50 +1,36 @@
-import { WalletAdapterNetwork, WalletError } from '@solana/wallet-adapter-base';
-import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
-import {
-    WalletModalProvider,
-    WalletDisconnectButton,
-    WalletMultiButton
-} from '@solana/wallet-adapter-react-ui';
-import { clusterApiUrl } from '@solana/web3.js';
-import { FC, ReactNode, useCallback, useMemo } from 'react';
-import { AutoConnectProvider, useAutoConnect } from './AutoConnectProvider';
-import { notify } from '@/lib/notifications';
-import { NetworkConfigurationProvider, useNetworkConfiguration } from './NetworkConfigurationProvider';
+"use client";
 
-const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
-  const { autoConnect } = useAutoConnect();
-  const { networkConfiguration } = useNetworkConfiguration();
-  const network = networkConfiguration as WalletAdapterNetwork;
-  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+import { FC, ReactNode, useMemo } from "react";
+import { SolflareWalletAdapter, NightlyWalletAdapter, PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
+import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
+import { ConnectionProvider, WalletProvider } from "@solana/wallet-adapter-react";
+import { clusterApiUrl } from "@solana/web3.js";
+import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
+import '@solana/wallet-adapter-react-ui/styles.css'
 
-  const onError = useCallback(
-    (error: WalletError) => {
-      notify({
-        type: 'error',
-        message: error.message ? `${error.name}: ${error.message}` : error.name,
-      });
-      console.error(error);
-    },
-    []
-  );
 
-  return (
-    <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={[]} onError={onError} autoConnect={autoConnect}>
-        <WalletModalProvider>
-            <WalletMultiButton />
-            <WalletDisconnectButton />
-          {children}
-        </WalletModalProvider>
-      </WalletProvider>
-    </ConnectionProvider>
-  );
-};
+interface ISolanaWalletProvider {
+    children: ReactNode
+}
 
-export const ContextProvider: FC<{ children: ReactNode }> = ({ children }) => (
-  <NetworkConfigurationProvider>
-    <AutoConnectProvider>
-      <WalletContextProvider>{children}</WalletContextProvider>
-    </AutoConnectProvider>
-  </NetworkConfigurationProvider>
-);
+const SolanaWalletProvider: FC<ISolanaWalletProvider> = ({ children }) => {
+    const network = WalletAdapterNetwork.Devnet;
+    const endpoint = useMemo(() => clusterApiUrl("devnet"), [network]);
+    const wallets = useMemo(() => [
+      new PhantomWalletAdapter(),
+      new SolflareWalletAdapter(),
+      new NightlyWalletAdapter(),
+    ], [endpoint]);
+
+    return (
+      <ConnectionProvider endpoint={endpoint}>
+        <WalletProvider wallets={wallets} autoConnect>
+          <WalletModalProvider>
+            {children}
+          </WalletModalProvider>
+        </WalletProvider>
+      </ConnectionProvider>
+    )
+}
+
+export default SolanaWalletProvider;

@@ -2,8 +2,10 @@
 
 import Link from 'next/link'
 import React from 'react'
-import { Button } from './ui/Button';
 import { usePathname } from 'next/navigation';
+
+import ConnectWallet from "./ConnectWallet";
+import { Button } from './ui/Button';
 import { cn } from '@/lib/utils';
 
 interface ILink {
@@ -23,6 +25,10 @@ const links: ILink[] = [
     {
         title: "Airdrop",
         route: "/airdrop"
+    },
+    {
+        title: "Pay",
+        route: "/pay"
     }
 ]
 
@@ -69,7 +75,7 @@ const Navigation = () => {
                 ))}
             </ul>
             
-            <Button>Connect wallet</Button>
+            <ConnectWallet />
         </div>
     </nav>
   )
