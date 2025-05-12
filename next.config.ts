@@ -1,7 +1,7 @@
 const webpack = require('webpack');
 
 module.exports = {
-  webpack: (config, { isServer }) => {
+  webpack: (config: any, { isServer }: { isServer: any }) => {
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
