@@ -50,13 +50,13 @@ const MintForm = () => {
 
         <Input 
             type="text"
-            name="amount"
-            placeholder="Token Amount"
-            value={formik.values.amount}
+            name="tkSupply"
+            placeholder="Token Supply"
+            value={formik.values.tkSupply}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            error={errors.amount.message}
-            aria-invalid={errors.amount.isInvalid}
+            error={errors.tkSupply.message}
+            aria-invalid={errors.tkSupply.isInvalid}
         />
 
         <Input 

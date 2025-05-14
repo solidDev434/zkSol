@@ -1,50 +1,29 @@
 "use client";
 
-import React, { useRef } from 'react'
-import { Keypair, PublicKey } from '@solana/web3.js';
-import {
-  encodeURL,
-  createQR
-} from "@solana/pay";
-import BigNumber from "bignumber.js";
+import { useWallet } from '@solana/wallet-adapter-react';
+import React, { useEffect } from 'react';
 
-const Pay = () => {
-  const qrRef = useRef<HTMLDivElement>(null);
+const DecompressTokens = () => {
+  const wallet = useWallet();
 
-  const recipient = new PublicKey("CN5iQKU2dY4SbPFYVjx4SfxJPLMPH4qRhnagkCnqPxQY");
-  const amount = new BigNumber(0.7);
-  const reference = new Keypair().publicKey;
-  const label = "ZKCompress Swap";
-  const message = "ZKCompress Swap - #132493";
-  const memo = "ZC#2343";
-  
-  const url = encodeURL({
-    recipient,
-    amount,
-    reference,
-    label,
-    message,
-    memo
-  });
-  const qrCode = createQR(url);
+  const fetchUserWalletTokens = React.useCallback(() => {
+    if (wallet.wallet && wallet.connected) {
+      
+    }
+  }, [wallet]);
 
-  if (qrRef.current) {
-    qrRef.current.innerHTML = "";
-    qrCode.append(qrRef.current);
-  }
+  useEffect(() => {
+    fetchUserWalletTokens();
+  }, [fetchUserWalletTokens]);
 
   return (
     <section className="wrapper">
       <div className="wrapper-content-container">
-        <h1 className="heading-title">Pay</h1>
-        <div 
-          ref={qrRef}
-          className="w-full"
-        />
-      </div>
-      
+        <h1 className="heading-title">ZKDecompressor</h1>
+
+      </div>      
     </section>
   )
 }
 
-export default Pay
+export default DecompressTokens

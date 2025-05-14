@@ -7,7 +7,7 @@ export const zkMintSchema = z.object({
     tkSymbol: z
         .string()
         .nonempty({ message: "Please fill in the Token Symbol" }),
-    amount: z
+    tkSupply: z
         .string()
         .regex(/^\d{1,}$/, { 
             message: "Please fill in a valid Token Amount" 

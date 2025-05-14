@@ -15,7 +15,7 @@ interface ILink {
 
 const links: ILink[] = [
     {
-        title: "Swap",
+        title: "zkSwap",
         route: "/"
     },
     {
