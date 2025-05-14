@@ -135,4 +135,41 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  .filepond_wrap {
+    margin-bottom: 0 !important;
+  }
+
+  .filepond_wrap .filepond--drip {
+    background: #18181b !important;
+    opacity: 1;
+  }
+
+  .filepond_wrap .filepond--credits {
+    display: none !important;
+    opacity: 0;
+  }
+
+  .filepond_wrap .filepond--drop-label.filepond--drop-label label {
+    font-size: 16px;
+  }
+
+  .styles_skeleton__tyzRD:before {
+    background: rgba(0,0,0,0.1) !important;
+    background-image: transparent !important;
+  }
+}
+
+@layer components {
+  .wrapper {
+    @apply pt-14 flex items-center justify-center;
+  }
+
+  .wrapper-content-container {
+    @apply w-xl space-y-4;
+  }
+
+  .heading-title {
+    @apply text-2xl font-semibold text-white;
+  }
 }

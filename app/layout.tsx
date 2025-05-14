@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
-import SolanaWalletProvider from "@/providers/SolanaWalletProvider";
+import Providers from "@/providers/Providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,12 +22,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} antialiased h-full min-h-screen grid grid-rows-[max-content_1fr]`}
+        className={`${geistSans.variable} antialiased h-full min-h-screen`}
       >
-        <SolanaWalletProvider>
-          <Navigation />
-          {children}
-        </SolanaWalletProvider>
+        <Providers>
+          <main className="grid grid-rows-[max-content_1fr] pb-8">
+            <Navigation />
+            {children}
+          </main>
+        </Providers>
       </body>
     </html>
   );

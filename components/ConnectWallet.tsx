@@ -14,11 +14,20 @@ const ConnectWallet: FC<ConnectWalletProps> = ({ className }) => {
 	return (
 		<div className={`sol ${className}`}>
 			{connected ? (
-                <Button onClick={() => disconnect()}>
+                <Button onClick={disconnect}>
                     {truncateWalletAddress(publicKey?.toString())}
                 </Button>
 			) : (
-				<WalletMultiButton />
+				<WalletMultiButton 
+					style={{ 
+						height: "36px", 
+						background: "oklch(90.5% 0.182 98.111)", 
+						color: "black", 
+						padding: "8px 16px", 
+						width: "max-content",
+						borderRadius: "6px"
+					}} 
+				/>
 			)}
 		</div>
 	);

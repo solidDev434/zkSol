@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useRef } from 'react'
-import { useWallet } from '@solana/wallet-adapter-react';
 import { Keypair, PublicKey } from '@solana/web3.js';
 import {
   encodeURL,
@@ -15,7 +14,7 @@ const Pay = () => {
   const recipient = new PublicKey("CN5iQKU2dY4SbPFYVjx4SfxJPLMPH4qRhnagkCnqPxQY");
   const amount = new BigNumber(0.7);
   const reference = new Keypair().publicKey;
-  const label = "ZKCompress Swap";;
+  const label = "ZKCompress Swap";
   const message = "ZKCompress Swap - #132493";
   const memo = "ZC#2343";
   
@@ -34,13 +33,17 @@ const Pay = () => {
     qrCode.append(qrRef.current);
   }
 
-  console.log(url, qrCode);
-
   return (
-    <div>
-      Pay
-      <div ref={qrRef}></div>
-    </div>
+    <section className="wrapper">
+      <div className="wrapper-content-container">
+        <h1 className="heading-title">Pay</h1>
+        <div 
+          ref={qrRef}
+          className="w-full"
+        />
+      </div>
+      
+    </section>
   )
 }
 

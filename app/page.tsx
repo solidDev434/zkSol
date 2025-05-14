@@ -1,10 +1,10 @@
-import SwapForm from "@/components/SwapForm";
+import SwapForm from "@/components/forms/SwapForm";
 
 function Swap() {
   return (
-    <section className="bg-red-full flex items-center justify-center">
-      <div className="w-xl space-y-4">
-        <h1 className="text-2xl font-semibold text-white">Swap</h1>
+    <section className="wrapper">
+      <div className="wrapper-content-container">
+        <h1 className="heading-title">Swap</h1>
 
         {/* Swap Form */}
         <SwapForm />

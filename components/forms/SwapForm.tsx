@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState } from 'react';
+import { ArrowDownUp } from 'lucide-react';
 
 import type { TokenData } from '@/lib/types';
-import TokenSelector from './TokenSelector';
-import { Input } from './ui/Input';
-import { Button } from './ui/Button';
-import { ArrowDownUp } from 'lucide-react';
+import TokenSelector from '../TokenSelector';
+import { Input } from '../ui/Input';
+import { Button } from '../ui/Button';
 
 const SwapForm = () => {
     const [inputToken, setInputToken] = React.useState<TokenData | null>(null);

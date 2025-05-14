@@ -19,16 +19,16 @@ const links: ILink[] = [
         route: "/"
     },
     {
-        title: "Mint",
-        route: "/mint"
+        title: "zkMint",
+        route: "/zk-mint"
     },
     {
-        title: "Airdrop",
-        route: "/airdrop"
+        title: "zkCompressor",
+        route: "/zk-compressor"
     },
     {
-        title: "Pay",
-        route: "/pay"
+        title: "zkDecompressor",
+        route: "/zk-decompressor"
     }
 ]
 
