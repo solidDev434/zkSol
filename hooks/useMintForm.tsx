@@ -11,6 +11,9 @@ import { toast } from "sonner";
 import { 
     Keypair, 
     SendTransactionError, 
+    sendAndConfirmTransaction,
+    SystemProgram,
+    PublicKey,
     Transaction, 
     TransactionMessage, 
     VersionedTransaction 
@@ -19,8 +22,11 @@ import {
     createAssociatedTokenAccountInstruction, 
     createInitializeMetadataPointerInstruction, 
     createMintToInstruction, 
+    createInitializeMintInstruction,
     ExtensionType, 
     getAssociatedTokenAddressSync, 
+    getOrCreateAssociatedTokenAccount,
+    mintTo as mintToSpl,
     getMintLen, 
     LENGTH_SIZE, 
     TOKEN_2022_PROGRAM_ID, 
@@ -28,14 +34,16 @@ import {
 } from "@solana/spl-token";
 import { 
     pack, 
-    createInitializeInstruction as createSplTokenMetadataInitializeInstruction
+    createInitializeInstruction
 } from "@solana/spl-token-metadata";
+import type { TokenMetadata } from "@solana/spl-token-metadata";
 import { 
     compress,
     transfer,
     CompressedTokenProgram 
 } from "@lightprotocol/compressed-token";
 import { connection } from "@/lib/conn";
+import { uploadTokenMetadata } from "@/lib/services/pinata";
 
 type MintValues = z.infer<typeof zkMintSchema>;
 
@@ -50,7 +58,7 @@ const useMintForm = () => {
             decimals: "",
             tkURI: "",
             attributes: [{ 
-                key: "", 
+                trait_type: "", 
                 value: "" 
             }]
         },
@@ -65,143 +73,188 @@ const useMintForm = () => {
             ) {
                 try {
                     const payload = JSON.stringify(values);
-                    const tokenAttributes = values.attributes.map(({ key, value }) => [key, value]);
+                    const tokenAttributes = values.attributes.map(({ trait_type, value }) => [trait_type, value]);
                     const tokenAttributesMetadata: (readonly [string, string])[] = tokenAttributes.map(attr => attr as unknown as readonly [string, string]);
                     
-                    const mint = Keypair.generate();
+                    const payer = Keypair.generate();
                     const tokenMetadata = {
-                        mint: mint.publicKey,
+                        mint: payer.publicKey,
                         name: values.tkName,
                         symbol: values.tkSymbol,
                         uri: values.tkURI,
                         additionalMetadata: tokenAttributesMetadata
-                    }
+                    };
+                    
+                    // Upload Token Metadata to Pinata
+                    const tokenMetadataURI = await uploadTokenMetadata(tokenMetadata);
+
 
                     const mintLen = getMintLen([ExtensionType.MetadataPointer]);
-                    const metadataLen =
-                        TYPE_SIZE + LENGTH_SIZE + pack(tokenMetadata).length;
+                    const metadataLen = TYPE_SIZE + LENGTH_SIZE + pack(tokenMetadata).length;
 
-                    const [
-                        createMintAccountIx, 
-                        initializeMintIx, 
-                        createTokenPoolIx
-                    ] = await CompressedTokenProgram.createMint({
-                        feePayer: wallet.publicKey,
-                        authority: wallet.publicKey,
-                        mint: mint.publicKey,
-                        decimals: Number(values.decimals),
-                        freezeAuthority: null,
-                        rentExemptBalance: await connection.getMinimumBalanceForRentExemption(
-                            mintLen + metadataLen
-                        ),
-                        mintSize: mintLen,
-                        tokenProgramId: TOKEN_2022_PROGRAM_ID,
-                    });
+                    const mintLamports = await connection.getMinimumBalanceForRentExemption(mintLen + metadataLen);
 
-                    const ataAddress = getAssociatedTokenAddressSync(
-                        mint.publicKey,
-                        wallet.publicKey,
-                        false,
-                        TOKEN_2022_PROGRAM_ID
-                    );
-                    console.log("ata", ataAddress, ataAddress.toBase58());
-                    const createAtaIx = createAssociatedTokenAccountInstruction(
-                        wallet.publicKey,
-                        ataAddress,
-                        wallet.publicKey,
-                        mint.publicKey,
-                        TOKEN_2022_PROGRAM_ID
-                    );
-
-                    const instructions = [
-                        createMintAccountIx,
-                        createInitializeMetadataPointerInstruction(
-                        mint.publicKey,
-                        wallet.publicKey,
-                        mint.publicKey,
-                        TOKEN_2022_PROGRAM_ID
-                        ),
-                        initializeMintIx,
-                        createSplTokenMetadataInitializeInstruction({
-                        programId: TOKEN_2022_PROGRAM_ID, // Token program hosting metadata
-                        mint: mint.publicKey,
-                        metadata: mint.publicKey,
-                        name: tokenMetadata.name,
-                        symbol: tokenMetadata.symbol,
-                        uri: tokenMetadata.uri,
-                        mintAuthority: wallet.publicKey,
-                        updateAuthority: wallet.publicKey,
+                    // Create and initialize mint and metadata pointer
+                    const mintTransaction = new Transaction().add(
+                        SystemProgram.createAccount({
+                            fromPubkey: payer.publicKey,
+                            newAccountPubkey: wallet.publicKey,
+                            space: mintLen,
+                            lamports: mintLamports,
+                            programId: TOKEN_2022_PROGRAM_ID
                         }),
-                        createTokenPoolIx,
-                        createAtaIx,
-                    ];
-
-                    const messageV0 = new TransactionMessage({
-                        payerKey: wallet.publicKey,
-                        recentBlockhash: (await connection.getLatestBlockhash()).blockhash,
-                        instructions,
-                    }).compileToV0Message();
-
-                    const signedTransaction = await wallet?.signTransaction(
-                        new VersionedTransaction(messageV0)
-                    );
-                    signedTransaction.sign([mint]);
-
-                    console.log(signedTransaction.message.serialize().toString("base64"));
-
-                    const signature = await connection.sendRawTransaction(
-                        signedTransaction.serialize()
-                    );
-
-                    toast.loading(
-                        `Transaction sent successfully, waiting for confirmation...`
-                    );
-                    // toast.close();
-
-                    await connection.confirmTransaction({
-                        signature,
-                        ...(await connection.getLatestBlockhash()),
-                    });
-
-                    toast.success(
-                        `Token mint created at ${mint.publicKey.toBase58()}\nSignature: ${signature}`
+                        createInitializeMetadataPointerInstruction(
+                            wallet.publicKey,
+                            payer.publicKey,
+                            wallet.publicKey,
+                            TOKEN_2022_PROGRAM_ID
+                        ),
+                        createInitializeMintInstruction(
+                            wallet.publicKey,
+                            Number(values.decimals),
+                            payer.publicKey,
+                            null,
+                            TOKEN_2022_PROGRAM_ID
+                        ),
+                        createInitializeInstruction({
+                            programId: TOKEN_2022_PROGRAM_ID,
+                            mint: wallet.publicKey,
+                            metadata: wallet.publicKey,
+                            name: tokenMetadata.name,
+                            symbol: tokenMetadata.symbol,
+                            uri: tokenMetadata.uri,
+                            mintAuthority: payer.publicKey,
+                            updateAuthority: payer.publicKey,
+                        })
                     );
 
-                    const mintToInstruction = createMintToInstruction(
-                        mint.publicKey,
-                        ataAddress,
-                        wallet.publicKey,
-                        Number(values.tkSupply),
-                        [],
-                        TOKEN_2022_PROGRAM_ID
+                    const txId = await sendAndConfirmTransaction(
+                        connection,
+                        mintTransaction,
+                        [payer, wallet]
                     );
 
-                    const mintTx = new Transaction();
-                    mintTx.add(mintToInstruction);
-                    mintTx.feePayer = wallet.publicKey;
-                    mintTx.recentBlockhash = (
-                        await connection.getLatestBlockhash()
-                    ).blockhash;
+                    // const [
+                    //     createMintAccountIx, 
+                    //     initializeMintIx, 
+                    //     createTokenPoolIx
+                    // ] = await CompressedTokenProgram.createMint({
+                    //     feePayer: wallet.publicKey,
+                    //     authority: wallet.publicKey,
+                    //     mint: payer.publicKey,
+                    //     decimals: Number(values.decimals),
+                    //     freezeAuthority: null,
+                    //     rentExemptBalance: await connection.getMinimumBalanceForRentExemption(
+                    //         mintLen + metadataLen
+                    //     ),
+                    //     mintSize: mintLen,
+                    //     tokenProgramId: TOKEN_2022_PROGRAM_ID,
+                    // });
 
-                    const signedMintTx = await wallet.signTransaction(
-                        new VersionedTransaction(mintTx.compileMessage())
-                    );
+                    // const ataAddress = getAssociatedTokenAddressSync(
+                    //     payer.publicKey,
+                    //     wallet.publicKey,
+                    //     false,
+                    //     TOKEN_2022_PROGRAM_ID
+                    // );
+                    // console.log("ata", ataAddress, ataAddress.toBase58());
+                    // const createAtaIx = createAssociatedTokenAccountInstruction(
+                    //     wallet.publicKey,
+                    //     ataAddress,
+                    //     wallet.publicKey,
+                    //     payer.publicKey,
+                    //     TOKEN_2022_PROGRAM_ID
+                    // );
 
-                    console.log(signedMintTx.message.serialize().toString("base64"));
+                    // const instructions = [
+                    //     createMintAccountIx,
+                    //     createInitializeMetadataPointerInstruction(
+                    //     payer.publicKey,
+                    //     wallet.publicKey,
+                    //     payer.publicKey,
+                    //     TOKEN_2022_PROGRAM_ID
+                    //     ),
+                    //     initializeMintIx,
+                    //     createInitializeInstruction({
+                    //     programId: TOKEN_2022_PROGRAM_ID,
+                    //     mint: payer.publicKey,
+                    //     metadata: payer.publicKey,
+                    //     name: tokenMetadata.name,
+                    //     symbol: tokenMetadata.symbol,
+                    //     uri: tokenMetadata.uri,
+                    //     mintAuthority: wallet.publicKey,
+                    //     updateAuthority: wallet.publicKey,
+                    //     }),
+                    //     createTokenPoolIx,
+                    //     createAtaIx,
+                    // ];
 
-                    const mintSignature = await connection.sendRawTransaction(
-                        signedMintTx.serialize()
-                    );
+                    // const messageV0 = new TransactionMessage({
+                    //     payerKey: wallet.publicKey,
+                    //     recentBlockhash: (await connection.getLatestBlockhash()).blockhash,
+                    //     instructions,
+                    // }).compileToV0Message();
 
-                    toast.loading(`Minting tokens...`);
+                    // const signedTransaction = await wallet?.signTransaction(
+                    //     new VersionedTransaction(messageV0)
+                    // );
+                    // signedTransaction.sign([payer]);
 
-                    await connection.confirmTransaction({
-                        signature: mintSignature,
-                        ...(await connection.getLatestBlockhash()),
-                    });
+                    // // console.log(signedTransaction.message.serialize().toString("base64"));
 
-                    toast.success(`Tokens minted successfully\nSignature: ${mintSignature}`);
-                    console.log(payload, mint, tokenMetadata);
+                    // const signature = await connection.sendRawTransaction(
+                    //     signedTransaction.serialize()
+                    // );
+
+                    // toast.loading(
+                    //     `Transaction sent successfully, waiting for confirmation...`
+                    // );
+                    // // toast.close();
+
+                    // await connection.confirmTransaction({
+                    //     signature,
+                    //     ...(await connection.getLatestBlockhash()),
+                    // });
+
+                    // toast.success(
+                    //     `Token mint created at ${payer.publicKey.toBase58()}\nSignature: ${signature}`
+                    // );
+
+                    // const mintToInstruction = createMintToInstruction(
+                    //     payer.publicKey,
+                    //     ataAddress,
+                    //     wallet.publicKey,
+                    //     Number(values.tkSupply),
+                    //     [],
+                    //     TOKEN_2022_PROGRAM_ID
+                    // );
+
+                    // const mintTx = new Transaction();
+                    // mintTx.add(mintToInstruction);
+                    // mintTx.feePayer = wallet.publicKey;
+                    // mintTx.recentBlockhash = (
+                    //     await connection.getLatestBlockhash()
+                    // ).blockhash;
+
+                    // const signedMintTx = await wallet.signTransaction(
+                    //     new VersionedTransaction(mintTx.compileMessage())
+                    // );
+
+                    // console.log(signedMintTx.message.serialize().toString("base64"));
+
+                    // const mintSignature = await connection.sendRawTransaction(
+                    //     signedMintTx.serialize()
+                    // );
+
+                    // toast.loading(`Minting tokens...`);
+
+                    // await connection.confirmTransaction({
+                    //     signature: mintSignature,
+                    //     ...(await connection.getLatestBlockhash()),
+                    // });
+
+                    // toast.success(`Tokens minted successfully\nSignature: ${mintSignature}`);
+                    // console.log(payload, payer, tokenMetadata);
                 } catch (err) {
                     if (err instanceof SendTransactionError) {
                         console.log(await err.getLogs(connection));
@@ -216,7 +269,7 @@ const useMintForm = () => {
         formik.setFieldValue("attributes", [
             ...formik.values.attributes,
             {
-                key: "",
+                trait_type: "",
                 value: ""
             }
         ]);
@@ -232,7 +285,7 @@ const useMintForm = () => {
     // Update Attribute field
     const updateAttribute = (
         index: number,
-        field: "key" | "value",
+        field: "trait_type" | "value",
         value: string
     ) => {
         const newAttributes = [...formik.values.attributes];
@@ -256,7 +309,7 @@ const useMintForm = () => {
         decimals: getFieldError<MintValues>(formik, "decimals"),
         tkURI: getFieldError<MintValues>(formik, "tkURI"),
         attributes: {
-            key: (index: number) => getFieldError<MintValues>(formik, `attributes[${index}].key`),
+            trait_type: (index: number) => getFieldError<MintValues>(formik, `attributes[${index}].trait_type`),
             value: (index: number) => getFieldError<MintValues>(formik, `attributes[${index}].value`)
         }
     }

@@ -79,6 +79,7 @@ const MintForm = () => {
             <header className="flex items-center justify-between">
                 <h5>Additional Attributes</h5>
                 <Button
+                    type="button"
                     variant="outline"
                     size="sm"
                     onClick={addAttribute}
@@ -95,10 +96,10 @@ const MintForm = () => {
                     >
                         <Input 
                             type="text"
-                            name={`attributes[${index}].key`}
-                            placeholder="key"
-                            value={attr.key}
-                            onChange={e => updateAttribute(index, "key", e.target.value)}
+                            name={`attributes[${index}].trait_type`}
+                            placeholder="Trait Type"
+                            value={attr.trait_type}
+                            onChange={e => updateAttribute(index, "trait_type", e.target.value)}
                             onBlur={formik.handleBlur}
                         />
                         

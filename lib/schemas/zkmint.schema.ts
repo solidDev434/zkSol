@@ -23,7 +23,7 @@ export const zkMintSchema = z.object({
     attributes: z
         .array(
           z.object({
-            key: z.string().nonempty("Attribute key is required"),
+            trait_type: z.string().nonempty("Attribute trait type is required"),
             value: z.string().nonempty("Attribute value is required"),
           })
         )

@@ -61,7 +61,6 @@ const FilepondUploader = ({
             const fileExt = file?.name.split(".").pop();
             const newFileName = `${filename}.${fileExt}`;
             const bucketName = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_STORAGE_BUCKET_NAME as string;
-            console.log(bucketName);
             
             try {
                 progress(false, 0, file.size);
