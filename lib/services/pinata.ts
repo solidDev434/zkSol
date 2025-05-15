@@ -1,16 +1,9 @@
 "server only";
 
 import { TokenMetadata } from "@solana/spl-token-metadata";
-import { PinataSDK } from "pinata";
-
-export const pinata = new PinataSDK({
-    pinataJwt: `${process.env.PINATA_JWT}`,
-    pinataGateway: `${process.env.NEXT_PUBLIC_GATEWAY_URL}`
-});
 
 export const uploadTokenMetadata = async (metadata: TokenMetadata): Promise<string> => {
     try {
-        console.log(process.env.NEXT_PUBLIC_PINATA_JWT)
         const response = await fetch('https://api.pinata.cloud/pinning/pinJSONToIPFS', {
             method: 'POST',
             headers: {

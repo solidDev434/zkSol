@@ -62,7 +62,7 @@ const MintForm = () => {
         <Input 
             type="text"
             name="decimals"
-            placeholder="Token decimals"
+            placeholder="Token decimals (6 -9)"
             value={formik.values.decimals}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -124,7 +124,7 @@ const MintForm = () => {
 
         <Button
             type="submit"
-            disabled={/*isValid ||*/ !connected}
+            disabled={isValid ||!connected}
             isLoading={isLoading}
             className="mt-3"
         >
