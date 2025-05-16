@@ -164,7 +164,6 @@ const useMintForm = () => {
                     toast.loading(
                         `Transaction sent successfully, waiting for confirmation...`
                     );
-                    // toast.close();
 
                     await connection.confirmTransaction({
                         signature,
@@ -229,9 +228,14 @@ const useMintForm = () => {
 
                     toast.success(`Tokens minted successfully\nSignature: ${mintSignature}`);
                 } catch (err) {
+                    console.log(err)
                     if (err instanceof SendTransactionError) {
                         console.log(await err.getLogs(connection));
                     }
+                } finally {
+                    setTimeout(() => {
+                        toast.dismiss();
+                    }, 500)
                 }
             }
         }
