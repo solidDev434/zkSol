@@ -31,7 +31,7 @@ function Input({ className, error, ...props }: InputProps) {
 
       {/* Error */}
       {error && (
-        <span className="text-sm font-inter text-destructive-light">{error}</span>
+        <span className="text-sm font-inter text-red-500">{error}</span>
       )}
     </div>
   )
