@@ -1,6 +1,6 @@
-# ZKSol-Minter - Compressed Token Minter
+# [ZKSol-Minter](https://zk-sol-minter.vercel.app/) - Compressed Token Minter
 
-ZKSol-Minter is a DApp that allows users to easily mint/create compressed Solana tokens (cTokens) directly to thier wallet. The platform leverages Solana's ZK compression technology to provide an efficient and user-friendly way to distribute tokens.
+[ZKSol-Minter](https://zk-sol-minter.vercel.app/) is a DApp that allows users to easily mint/create compressed Solana tokens (cTokens) directly to thier wallet. The platform leverages Solana's ZK compression technology to provide an efficient and user-friendly way to distribute tokens.
 <img width="1508" alt="Screenshot 2025-05-12 at 11 41 42 AM" src="https://zk-sol-minter.vercel.app/app-preview.png" />
 
 
