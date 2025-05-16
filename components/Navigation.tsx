@@ -2,81 +2,22 @@
 
 import Link from 'next/link'
 import React from 'react'
-import { usePathname } from 'next/navigation';
 
 import ConnectWallet from "./ConnectWallet";
-import { Button } from './ui/Button';
-import { cn } from '@/lib/utils';
 
-interface ILink {
-    title: string;
-    route: string;
-}
-
-const links: ILink[] = [
-    {
-        title: "zkSwap",
-        route: "/"
-    },
-    {
-        title: "zkMint",
-        route: "/zk-mint"
-    },
-    {
-        title: "zkCompressor",
-        route: "/zk-compressor"
-    },
-    {
-        title: "zkDecompressor",
-        route: "/zk-decompressor"
-    }
-]
-
-const NavigationLink = ({
-    title,
-    route
-}: ILink) => {
-    const pathname = usePathname();
-    const isActive = pathname === route ? "font-bold text-white" : "";
-
-    return (
-        <li>
-            <Link
-                href={route}
-                className={cn(
-                    "",
-                    isActive
-                )}
-            >
-                {title}
-            </Link>
-        </li>
-    )
-}
 
 const Navigation = () => {
   return (
-    <nav className="w-full flex items-center justify-between h-16 px-5 sticky top-0 backdrop-blur-lg">
+    <nav className="w-full flex items-center justify-between h-16 px-3 sm:px-5 sticky top-0 backdrop-blur-lg z-50 nav-mask">
         <Link
             href="/"
             className="flex items-center gap-2"
         >
             <span className="size-6 bg-yellow-300 rounded-full" />
-            <span className="font-bold text-white">ZKSwap</span>
+            <span className="font-bold text-white">ZKSol</span>
         </Link>
 
-        <div className="flex items-center gap-6">
-            <ul className="flex items-center gap-x-3">
-                {links.map(link => (
-                    <NavigationLink 
-                        key={link.title}
-                        {...link}
-                    />
-                ))}
-            </ul>
-            
-            <ConnectWallet />
-        </div>
+        <ConnectWallet />
     </nav>
   )
 }

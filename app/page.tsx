@@ -1,16 +1,17 @@
-import SwapForm from "@/components/forms/SwapForm";
+import React from 'react'
+import MintForm from '@/components/forms/MintForm'
 
-function Swap() {
+const Mint = () => {
   return (
     <section className="wrapper">
       <div className="wrapper-content-container">
-        <h1 className="heading-title">Swap</h1>
+        <h1 className="heading-title">ZKCompressed Minter</h1>
 
-        {/* Swap Form */}
-        <SwapForm />
+        {/* Mint Form */}
+        <MintForm />
       </div>
     </section>
-  );
+  )
 }
 
-export default Swap;
+export default Mint

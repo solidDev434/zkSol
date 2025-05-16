@@ -77,7 +77,7 @@ const MintForm = () => {
 
         <div className="w-full space-y-3">
             <header className="flex items-center justify-between">
-                <h5>Additional Attributes</h5>
+                <h5 className="text-[15px] sm:text-base">Additional Attributes</h5>
                 <Button
                     type="button"
                     variant="outline"
@@ -92,7 +92,7 @@ const MintForm = () => {
                 {formik.values.attributes?.map((attr, index) => (
                     <div 
                         key={index}
-                        className="grid grid-cols-[repeat(2,1fr)_max-content] items-center gap-2.5"
+                        className="grid grid-cols-[repeat(2,1fr)_max-content] items-center gap-2 sm:gap-2.5"
                     >
                         <Input 
                             type="text"
@@ -115,7 +115,7 @@ const MintForm = () => {
                             onClick={() => removeAttribute(index)}
                             className="bg-white rounded-full p-0.5"
                         >
-                            <X className="text-red-500 size-6" />
+                            <X className="text-red-500 size-5 sm:size-6" />
                         </span>
                     </div>
                 ))}

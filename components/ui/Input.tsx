@@ -19,7 +19,7 @@ function Input({ className, type, error, ...props }: InputProps) {
         <input
           data-slot="input"
           className={cn(
-            "file:text-foreground placeholder:text-muted-foreground selection:text-primary-foreground border-grey-300/45 flex h-12  w-full min-w-0 rounded-[6px] border bg-grey-100 p-4 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-base",
+            "file:text-foreground placeholder:text-muted-foreground selection:text-primary-foreground border-grey-300/45 flex h-10 sm:h-12  w-full min-w-0 rounded-[6px] border bg-grey-100 p-4 text-sm sm:text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-base",
             "focus-visible:ring-yellow-300/20 focus-visible:border-yellow-300/60 focus-visible:ring-1",
             "aria-invalid:ring-destructive/20 aria-invalid:border-destructive aria-invalid:shadow-lg aria-invalid:shadow-destructive-shadow",
             className

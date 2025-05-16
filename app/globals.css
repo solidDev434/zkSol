@@ -162,14 +162,22 @@
 
 @layer components {
   .wrapper {
-    @apply pt-14 flex items-center justify-center;
+    @apply pt-10 md:pt-14 flex items-center justify-center;
   }
 
   .wrapper-content-container {
-    @apply w-xl space-y-4;
+    @apply w-[89%] sm:w-xl space-y-4;
   }
 
   .heading-title {
-    @apply text-2xl font-semibold text-white;
+    @apply text-xl sm:text-2xl font-semibold text-white;
+  }
+
+  .nav-mask {
+    background-color: transparent;
+    background-image: radial-gradient(transparent 1px,var(--background) 1px);
+    background-size: 4px 4px;
+    backdrop-filter: blur(3px);
+    mask: linear-gradient(#000 calc(100% - 20px),#0000);
   }
 }

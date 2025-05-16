@@ -10,8 +10,8 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "ZKSwap Pay",
-  description: "Solpay + ZkCompression Swap",
+  title: "ZKSol",
+  description: "ZkCompression Minter",
 };
 
 export default function RootLayout({
