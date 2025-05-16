@@ -15,7 +15,7 @@ const ConnectWallet: FC<ConnectWalletProps> = ({ className }) => {
 		<div className={`sol ${className}`}>
 			{connected ? (
                 <Button onClick={disconnect}>
-                    {truncateWalletAddress(publicKey?.toString())}
+                    {truncateWalletAddress(publicKey?.toString() as string)}
                 </Button>
 			) : (
 				<WalletMultiButton 

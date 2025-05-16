@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const truncateWalletAddress = (address: any) => {
+export const truncateWalletAddress = (address: string) => {
   return `${address.substring(0, 5)}••••${address.substring(address.length - 4, address.length)}`
 }
 

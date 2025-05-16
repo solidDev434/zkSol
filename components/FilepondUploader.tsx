@@ -57,6 +57,7 @@ const FilepondUploader = ({
         options
     ) => {
         if (file) {
+            console.log(fieldName, metadata, transfer, options);
             const filename = nanoid();
             const fileExt = file?.name.split(".").pop();
             const newFileName = `${filename}.${fileExt}`;
@@ -96,6 +97,7 @@ const FilepondUploader = ({
                 // Set images
                 setImage(publicUrlData.publicUrl);
             } catch (err) {
+                console.log(err);
                 return {
                     abort: () => {
                         abort(); // Abort FilePond upload

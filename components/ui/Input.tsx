@@ -8,7 +8,7 @@ interface InputProps extends React.ComponentProps<"input"> {
   error?: string;
 }
 
-function Input({ className, type, error, ...props }: InputProps) {
+function Input({ className, error, ...props }: InputProps) {
 
   return (
     <div
