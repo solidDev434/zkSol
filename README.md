@@ -56,7 +56,7 @@ NEXT_PUBLIC_PINATA_JWT=
 
 ## How It Works
 
-1. **Create an Event**: Input Token Information
+1. **Mints token**: Input Token Information
 2. **Uploads Token Image URI**: Uploads image URI to Supabase using Filepond
 3. Mints cToken to user wallet 
 
