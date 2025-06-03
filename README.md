@@ -14,7 +14,7 @@
 
 ## Tech Stack
 
-- **Frontend**: Next.js 14 with App Router
+- **Frontend**: Next.js 15 with App Router
 - **Styling**: TailwindCSS with NativeWind
 - **Blockchain**: Solana Web3.js, SPL Token, Light Protocol (Compressed Tokens)
 - **Image Storage**: Supabase
